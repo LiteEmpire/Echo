@@ -1,0 +1,8 @@
+name = "lite-ai-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Set to your GitHub Pages origin. Do not include the /Echo/ path.
+ALLOWED_ORIGIN = "https://liteempire.github.io"
+OPENROUTER_MODEL = "openrouter/auto"
