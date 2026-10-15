@@ -64,7 +64,7 @@ export default function App() {
     const controller = new AbortController(); aborter.current = controller; setBusy(true)
     const timer = window.setTimeout(() => controller.abort(), 120000)
     try {
-      const res = await fetch(API + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ model: prefs.model, search, memory: prefs.memory, messages: history }) })
+      const res = await fetch(API + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ model: prefs.model, search, memory: prefs.memory, messages: prefs.memory ? history : history.slice(-1) }) })
       if (!res.ok) { let msg = 'The AI service could not answer.'; try { msg = (await res.json()).error || msg } catch {} throw new Error(msg) }
       if ((res.headers.get('content-type') || '').includes('text/event-stream') && res.body) {
         const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = ''
@@ -100,7 +100,7 @@ export default function App() {
     patchMessage(active.id, message.id, { content: '', error: false })
     const controller = new AbortController(); aborter.current = controller; setBusy(true)
     try {
-      const res = await fetch(API + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ model: prefs.model, search, memory: prefs.memory, messages: history }) })
+      const res = await fetch(API + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ model: prefs.model, search, memory: prefs.memory, messages: prefs.memory ? history : history.slice(-1) }) })
       if (!res.ok) throw new Error((await res.json()).error || 'Retry failed.')
       const data = await res.json(); patchMessage(active.id, message.id, { content: data.choices?.[0]?.message?.content ?? data.content ?? data.answer ?? 'Empty answer.' })
     } catch (e) { patchMessage(active.id, message.id, { content: e instanceof Error ? e.message : 'Retry failed.', error: true }) }
