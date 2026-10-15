@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>Lite AI — Your AI workspace</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#111a2e;--panel2:#17223a;--line:#26334f;--text:#f3f6ff;--muted:#9aa8c4;--accent:#8b7cff;--accent2:#5b8cff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#252454 0,transparent 48%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.app{max-width:1000px;margin:auto;min-height:100vh;display:flex;flex-direction:column;padding:22px}
+.top{display:flex;align-items:center;gap:12px;padding:8px 0 22px;border-bottom:1px solid var(--line)}.logo{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:900;font-size:20px;box-shadow:0 8px 28px #6f65ff40}.brand{font-size:19px;font-weight:800;letter-spacing:-.5px}.sub{color:var(--muted);font-size:12px}.spacer{flex:1}.status{border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--muted);font-size:12px}.dot{display:inline-block;width:7px;height:7px;background:#e9b65d;border-radius:50%;margin-right:6px}
+.content{flex:1;display:flex;flex-direction:column;width:100%;max-width:780px;margin:0 auto;padding:38px 0 20px}.welcome{text-align:center;margin:16px 0 28px}.orb{width:68px;height:68px;margin:0 auto 20px;border-radius:24px;display:grid;place-items:center;font-size:30px;background:linear-gradient(135deg,#29255a,#172c52);border:1px solid #454078;box-shadow:0 12px 50px #675dff22}.welcome h1{font-size:clamp(30px,5vw,43px);letter-spacing:-1.5px;line-height:1.1;margin:0 0 12px}.gradient{background:linear-gradient(90deg,#b8aaff,#82c4ff);background-clip:text;color:transparent}.welcome p{color:var(--muted);margin:0 auto;max-width:480px}.notice{border:1px solid #62512c;background:#2b2417;color:#f4d9a0;border-radius:14px;padding:13px 15px;font-size:13px;margin-bottom:18px}.notice strong{display:block;margin-bottom:3px;color:#ffe6b0}.messages{display:flex;flex-direction:column;gap:14px;margin-bottom:20px}.msg{max-width:88%;border:1px solid var(--line);background:var(--panel);border-radius:17px;padding:13px 16px;white-space:pre-wrap;overflow-wrap:anywhere}.msg.user{align-self:flex-end;background:#302b68;border-color:#5146a0}.msg.bot{align-self:flex-start}.label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#a9b5d1;margin-bottom:5px}.composer{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 20%);padding:12px 0 10px}.form{display:flex;align-items:flex-end;gap:10px;border:1px solid #354261;background:#111a2e;padding:9px;border-radius:18px;box-shadow:0 15px 45px #0003}.form:focus-within{border-color:#8074ff;box-shadow:0 0 0 3px #8074ff20}textarea{flex:1;resize:none;max-height:150px;min-height:44px;border:0;outline:0;background:transparent;color:var(--text);font:inherit;padding:10px 8px}button{border:0;border-radius:12px;padding:12px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font:inherit;font-weight:700;cursor:pointer}button:disabled{opacity:.5;cursor:wait}.hint{text-align:center;color:#7785a4;font-size:11px;margin-top:10px}.quick{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:18px}.quick button{background:#141e34;border:1px solid var(--line);color:#c8d2e9;font-size:12px;font-weight:500;padding:9px 12px}.foot{color:#697795;text-align:center;font-size:11px;padding:12px 0 0}
+@media(max-width:600px){.app{padding:15px}.content{padding-top:22px}.status{display:none}.msg{max-width:95%}.welcome h1{font-size:32px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="logo">L</div><div><div class="brand">Lite AI</div><div class="sub">Your personal AI workspace</div></div><div class="spacer"></div><div class="status"><span class="dot"></span>AI engine not connected</div></header>
+<main class="content">
+<section class="welcome" id="welcome"><div class="orb">✦</div><h1>What can we <span class="gradient">figure out?</span></h1><p>A clean home for your ideas, questions, and projects.</p></section>
+<div class="notice"><strong>Setup needed before real AI replies</strong>This website is published as a front-end starter. Tripo is for 3D generation, not general chat. A chat-model API and a secure backend must be connected before messages can receive AI-generated answers. Never put private API keys in this page.</div>
+<div class="quick" id="quick"><button type="button" data-prompt="Help me brainstorm a creative project.">✨ Brainstorm ideas</button><button type="button" data-prompt="Explain a difficult topic in simple words.">📚 Explain a topic</button><button type="button" data-prompt="Help me plan a website project.">💻 Plan a website</button></div>
+<section class="messages" id="messages" aria-live="polite"><div class="msg bot"><div class="label">Lite AI · Setup assistant</div>Hey! I'm Lite AI's interface. I can show you the chat experience, but I can't generate real AI answers until a chat model is connected. You can type a message to see the setup guidance.</div></section>
+<div class="composer"><form class="form" id="chat"><textarea id="prompt" rows="1" maxlength="4000" placeholder="Message Lite AI…" aria-label="Your message" required></textarea><button id="send" type="submit" aria-label="Send message">Send ↑</button></form><div class="hint">Enter to send · Shift + Enter for a new line</div></div>
+<div class="foot">Made for Lite · Keep API keys private</div>
+</main></div>
+<script>
+const form=document.querySelector('#chat'),input=document.querySelector('#prompt'),messages=document.querySelector('#messages'),send=document.querySelector('#send'),welcome=document.querySelector('#welcome'),quick=document.querySelector('#quick');
+function add(text,who){const el=document.createElement('div');el.className='msg '+who;if(who==='bot'){const label=document.createElement('div');label.className='label';label.textContent='Lite AI · Setup assistant';el.append(label)}el.append(document.createTextNode(text));messages.append(el);el.scrollIntoView({behavior:'smooth',block:'nearest'})}
+function submitMessage(text){const value=(text??input.value).trim();if(!value)return;welcome.style.display='none';quick.style.display='none';add(value,'user');input.value='';add('Your message is displayed, but no chat AI provider is connected yet. To make Lite AI answer questions, we need a chat-model API and a secure backend endpoint. Your Tripo API can be used separately for 3D-generation features. No API key is requested or stored by this demo.','bot')}
+form.addEventListener('submit',e=>{e.preventDefault();submitMessage()});
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
+input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,150)+'px'});
+quick.addEventListener('click',e=>{const b=e.target.closest('button[data-prompt]');if(b)submitMessage(b.dataset.prompt)});
+</script>
+</body></html>
