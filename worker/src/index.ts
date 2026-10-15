@@ -60,7 +60,7 @@ export default {
       })
       if (messages.some((m: any) => !m.content.trim())) return json({ error: 'Messages cannot be empty.' }, 400, headers)
       const model = typeof input.model === 'string' && /^[a-zA-Z0-9._/-]{2,120}$/.test(input.model) ? input.model : (env.OPENROUTER_MODEL || 'openrouter/auto')
-      const payload: any = { model, messages, stream: true, max_tokens: 1800, temperature: 0.7 }
+      const payload: any = { model, messages, stream: input.stream !== false, max_tokens: 1800, temperature: 0.7 }
       if (input.search === true) payload.plugins = [{ id: 'web' }]
       let upstream: Response
       try {
