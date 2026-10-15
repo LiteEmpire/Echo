@@ -31,6 +31,7 @@ export default function App() {
   const [studio, setStudio] = useState(false)
   const [prompt3d, setPrompt3d] = useState('')
   const [studioStatus, setStudioStatus] = useState('')
+  const [task3dId, setTask3dId] = useState('')
   const [modelOutput, setModelOutput] = useState<{model_url?: string; rendered_image_url?: string} | null>(null)
   const [copied, setCopied] = useState('')
   const aborter = useRef<AbortController | null>(null)
@@ -110,15 +111,28 @@ export default function App() {
   async function generate3D() {
     if (!prompt3d.trim()) return
     if (!API) { setStudioStatus('Configure VITE_API_BASE_URL and the server-side TRIPO_API_KEY first.'); return }
-    setStudioStatus('Sending request to Tripo…'); setModelOutput(null)
+    setStudioStatus('Sending request to Tripo…'); setModelOutput(null); setTask3dId('')
     try {
       const res = await fetch(API + '/api/3d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: prompt3d.trim() }) })
       const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Could not start generation.')
+      setTask3dId(data.task_id)
       setStudioStatus('Task submitted. Check status again shortly.')
       const check = await fetch(API + '/api/3d/' + encodeURIComponent(data.task_id))
       const task = await check.json(); if (!check.ok) throw new Error(task.error || 'Could not query task.')
       setModelOutput(task.output || null); setStudioStatus(task.status === 'success' ? 'Model ready.' : 'Generation status: ' + task.status + (task.progress != null ? ' (' + task.progress + '%)' : ''))
     } catch (e) { setStudioStatus(e instanceof Error ? e.message : '3D generation failed.') }
+  }
+
+  async function check3DStatus() {
+    if (!task3dId || !API) return
+    setStudioStatus('Checking Tripo task…')
+    try {
+      const res = await fetch(API + '/api/3d/' + encodeURIComponent(task3dId))
+      const task = await res.json()
+      if (!res.ok) throw new Error(task.error || 'Could not check task.')
+      setModelOutput(task.output || null)
+      setStudioStatus(task.status === 'success' ? 'Model ready.' : 'Generation status: ' + task.status + (task.progress != null ? ' (' + task.progress + '%)' : '') + '. Check again in a moment.')
+    } catch (e) { setStudioStatus(e instanceof Error ? e.message : 'Could not check task status.') }
   }
 
   const copy = async (m: Message) => { try { await navigator.clipboard.writeText(m.content); setCopied(m.id); setTimeout(() => setCopied(''), 1300) } catch { setNotice('Clipboard access was blocked by your browser.') } }
@@ -161,6 +175,6 @@ export default function App() {
     {settings && <div className="modal-backdrop" onClick={() => setSettings(false)}><section className="settings-modal" onClick={e => e.stopPropagation()}><div className="modal-head"><div><span className="eyebrow">PREFERENCES</span><h2>Settings</h2></div><button className="icon-button" onClick={() => setSettings(false)} aria-label="Close"><X size={19}/></button></div>
       <div className="settings-section"><h3>Appearance</h3><p>Make your workspace feel like yours.</p><div className="setting-row"><div><strong>Theme</strong><small>Choose light or dark appearance</small></div><div className="segmented"><button className={prefs.theme === 'dark' ? 'chosen' : ''} onClick={() => patchPrefs({ theme: 'dark' })}><Moon size={14}/> Dark</button><button className={prefs.theme === 'light' ? 'chosen' : ''} onClick={() => patchPrefs({ theme: 'light' })}><Sun size={14}/> Light</button></div></div><div className="setting-row"><div><strong>Accent color</strong><small>Customize highlights</small></div><div className="swatches">{[['Violet','#8b7cff'],['Blue','#5b8cff'],['Mint','#48c7a5'],['Rose','#f078a8'],['Amber','#e9ac53']].map(([name,color]) => <button key={color} title={name} aria-label={name} className={'swatch ' + (prefs.accent === color ? 'chosen' : '')} style={{ background: color }} onClick={() => patchPrefs({ accent: color })}/>)}</div></div></div>
       <div className="settings-section"><h3>AI & privacy</h3><p>Chat history and preferences are stored locally in this browser.</p><div className="setting-row"><div><strong>Conversation context</strong><small>Send current chat history with each request</small></div><button className={'switch ' + (prefs.memory ? 'on' : '')} role="switch" aria-checked={prefs.memory} onClick={() => patchPrefs({ memory: !prefs.memory })}><span/></button></div><div className="setting-row"><div><strong>Chat model</strong><small>Must be supported by your backend</small></div><select className="model-input" value={prefs.model} onChange={e => patchPrefs({ model: e.target.value })}><option value="openrouter/auto">Automatic (OpenRouter)</option><option value="openai/gpt-4o-mini">GPT-4o mini</option><option value="anthropic/claude-3.5-haiku">Claude Haiku</option></select></div><div className="setting-row"><div><strong>Backend URL</strong><small>{API || 'Not configured · see .env.example'}</small></div><span className={'status-badge ' + (configured ? 'good' : '')}>{configured ? 'Configured' : 'Not set'}</span></div><div className="setting-row"><div><strong>Clear conversations</strong><small>Remove saved history from this browser</small></div><button className="danger-button" onClick={() => { setChats([]); setActiveId(''); localStorage.removeItem(CHAT_KEY); setSettings(false) }}><Trash2 size={14}/> Clear all</button></div></div><div className="settings-foot"><span>Lite AI · Preview</span><button onClick={() => setSettings(false)}>Done</button></div></section></div>}
-    {studio && <div className="modal-backdrop" onClick={() => setStudio(false)}><section className="settings-modal studio-modal" onClick={e => e.stopPropagation()}><div className="modal-head"><div><span className="eyebrow">TRIPO INTEGRATION</span><h2><Box size={21}/> 3D Studio</h2></div><button className="icon-button" onClick={() => setStudio(false)} aria-label="Close 3D studio"><X size={19}/></button></div><p className="studio-intro">Generate a 3D model from text using Tripo. This may consume your Tripo credits.</p><label className="field-label" htmlFor="model-prompt">Describe your model</label><textarea id="model-prompt" className="studio-textarea" rows={4} maxLength={1024} value={prompt3d} onChange={e => setPrompt3d(e.target.value)} placeholder="A tiny ceramic fox figurine with amber details…"/><div className="studio-meta"><span>{prompt3d.length}/1024 characters</span><span>Text-to-3D · Tripo</span></div><button className="studio-generate" disabled={!prompt3d.trim()} onClick={() => void generate3D()}><Sparkles size={16}/> Generate 3D model <ArrowUp size={16}/></button>{studioStatus && <div className="studio-status"><span className="notice-dot"/>{studioStatus}</div>}{modelOutput?.rendered_image_url && <img className="model-preview" src={modelOutput.rendered_image_url} alt="Generated 3D model preview"/>}{modelOutput?.model_url && <a className="download-model" href={modelOutput.model_url} target="_blank" rel="noreferrer"><ExternalLink size={15}/> Open / download model (.glb)</a>}<div className="studio-footnote"><AlertCircle size={14}/> API credentials stay on the backend. A Tripo key and configured Worker are required.</div></section></div>}
+    {studio && <div className="modal-backdrop" onClick={() => setStudio(false)}><section className="settings-modal studio-modal" onClick={e => e.stopPropagation()}><div className="modal-head"><div><span className="eyebrow">TRIPO INTEGRATION</span><h2><Box size={21}/> 3D Studio</h2></div><button className="icon-button" onClick={() => setStudio(false)} aria-label="Close 3D studio"><X size={19}/></button></div><p className="studio-intro">Generate a 3D model from text using Tripo. This may consume your Tripo credits.</p><label className="field-label" htmlFor="model-prompt">Describe your model</label><textarea id="model-prompt" className="studio-textarea" rows={4} maxLength={1024} value={prompt3d} onChange={e => setPrompt3d(e.target.value)} placeholder="A tiny ceramic fox figurine with amber details…"/><div className="studio-meta"><span>{prompt3d.length}/1024 characters</span><span>Text-to-3D · Tripo</span></div><button className="studio-generate" disabled={!prompt3d.trim()} onClick={() => void generate3D()}><Sparkles size={16}/> Generate 3D model <ArrowUp size={16}/></button>{studioStatus && <div className="studio-status"><span className="notice-dot"/>{studioStatus}</div>}{task3dId && !modelOutput?.model_url && <button className="studio-generate" onClick={() => void check3DStatus()}>Check generation status <RefreshCw size={14}/></button>}{modelOutput?.rendered_image_url && <img className="model-preview" src={modelOutput.rendered_image_url} alt="Generated 3D model preview"/>}{modelOutput?.model_url && <a className="download-model" href={modelOutput.model_url} target="_blank" rel="noreferrer"><ExternalLink size={15}/> Open / download model (.glb)</a>}<div className="studio-footnote"><AlertCircle size={14}/> API credentials stay on the backend. A Tripo key and configured Worker are required.</div></section></div>}
   </div>
 }
