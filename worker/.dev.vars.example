@@ -1,0 +1,4 @@
+# Copy to .dev.vars for local testing, then add real values locally only.
+# Never commit .dev.vars.
+OPENROUTER_API_KEY=replace-with-your-own-key
+TRIPO_API_KEY=replace-with-your-own-key
