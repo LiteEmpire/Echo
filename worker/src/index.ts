@@ -54,10 +54,8 @@ export default {
       let input: any
       try { input = await request.json() } catch { return json({ error: 'Invalid JSON body.' }, 400, headers) }
       if (!Array.isArray(input.messages) || input.messages.length < 1 || input.messages.length > 40) return json({ error: 'Send between 1 and 40 messages.' }, 400, headers)
-      const messages = input.messages.map((m: any) => {
-        if (!m || !['user', 'assistant'].includes(m.role) || typeof m.content !== 'string') throw new Error('invalid')
-        return { role: m.role, content: m.content.slice(0, 8000) }
-      })
+      if (input.messages.some((m: any) => !m || !['user', 'assistant'].includes(m.role) || typeof m.content !== 'string')) return json({ error: 'Each message must have a valid role and text content.' }, 400, headers)
+      const messages = input.messages.map((m: any) => ({ role: m.role, content: m.content.slice(0, 8000) }))
       if (messages.some((m: any) => !m.content.trim())) return json({ error: 'Messages cannot be empty.' }, 400, headers)
       const model = typeof input.model === 'string' && /^[a-zA-Z0-9._/-]{2,120}$/.test(input.model) ? input.model : (env.OPENROUTER_MODEL || 'openrouter/auto')
       const payload: any = { model, messages, stream: input.stream !== false, max_tokens: 1800, temperature: 0.7 }
