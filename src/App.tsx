@@ -100,7 +100,7 @@ export default function App() {
     patchMessage(active.id, message.id, { content: '', error: false })
     const controller = new AbortController(); aborter.current = controller; setBusy(true)
     try {
-      const res = await fetch(API + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ model: prefs.model, search, memory: prefs.memory, messages: prefs.memory ? history : history.slice(-1) }) })
+      const res = await fetch(API + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ model: prefs.model, search, memory: prefs.memory, stream: false, messages: prefs.memory ? history : history.slice(-1) }) })
       if (!res.ok) throw new Error((await res.json()).error || 'Retry failed.')
       const data = await res.json(); patchMessage(active.id, message.id, { content: data.choices?.[0]?.message?.content ?? data.content ?? data.answer ?? 'Empty answer.' })
     } catch (e) { patchMessage(active.id, message.id, { content: e instanceof Error ? e.message : 'Retry failed.', error: true }) }
