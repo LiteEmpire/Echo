@@ -1,4 +1,4 @@
-name: Deploy Lite AI to GitHub Pages
+name: Deploy Echo to GitHub Pages
 
 on:
   push:
