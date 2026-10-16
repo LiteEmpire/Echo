@@ -1,4 +1,4 @@
-# Lite AI
+# Echo
 
 A browser-based AI workspace with a React + TypeScript frontend, a separate Cloudflare Worker API, OpenRouter-powered chat, and Tripo 3D generation. This repository is independent of the portfolio repository.
 
