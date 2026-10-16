@@ -1,4 +1,4 @@
-name = "lite-ai-api"
+name = "echo-api"
 main = "src/index.ts"
 compatibility_date = "2026-10-01"
 
