@@ -45,7 +45,7 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers })
     if (origin && !allowed.includes(origin) && !local) return json({ error: 'This website is not allowed to use the API.' }, 403)
     const url = new URL(request.url)
-    if (!url.pathname.startsWith('/api/')) return json({ service: 'Lite AI API', status: 'ready' }, 200, headers)
+    if (!url.pathname.startsWith('/api/')) return json({ service: 'Echo API', status: 'ready' }, 200, headers)
     if (request.method === 'POST' && Number(request.headers.get('Content-Length') || 0) > MAX_BODY) return json({ error: 'Request is too large.' }, 413, headers)
     if (limited(request)) return json({ error: 'Too many requests. Please wait a minute and try again.' }, 429, { ...Object.fromEntries(headers) })
 
@@ -64,7 +64,7 @@ export default {
       try {
         upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + env.OPENROUTER_API_KEY, 'Content-Type': 'application/json', 'HTTP-Referer': env.ALLOWED_ORIGIN?.split(',')[0] || 'https://liteempire.github.io/Echo/', 'X-Title': 'Lite AI' },
+          headers: { 'Authorization': 'Bearer ' + env.OPENROUTER_API_KEY, 'Content-Type': 'application/json', 'HTTP-Referer': env.ALLOWED_ORIGIN?.split(',')[0] || 'https://liteempire.github.io/Echo/', 'X-Title': 'Echo' },
           body: JSON.stringify(payload),
           signal: AbortSignal.timeout(110_000),
         })
