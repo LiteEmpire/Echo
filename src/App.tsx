@@ -155,7 +155,7 @@ export default function App() {
         </div>)}
       </div>
       <div className="sidebar-bottom"><div className="connection-state"><span className={'state-dot ' + (configured ? 'online' : '')}/>{configured ? 'Backend configured' : 'Setup required'}<span className="connection-right">{configured ? 'API' : 'OFF'}</span></div>
-        <button className="profile-row" onClick={() => setSettings(true)}><div className="avatar">L</div><div className="profile-copy"><strong>Echo</strong><small>Personal workspace</small></div><Settings2 size={17} className="profile-settings"/></button></div>
+        <button className="profile-row" onClick={() => setSettings(true)}><div className="avatar">E</div><div className="profile-copy"><strong>Echo</strong><small>Personal workspace</small></div><Settings2 size={17} className="profile-settings"/></button></div>
     </aside>
     <main className="main-area">
       <header className="topbar"><div className="top-left">{!sidebar && <button className="icon-button" aria-label="Open sidebar" onClick={() => setSidebar(true)}><PanelLeftOpen size={19}/></button>}<div className="model-select-wrap"><span className="model-orb"><Sparkles size={14}/></span><span className="model-name">Echo</span><span className="model-pill">Preview</span></div></div>
